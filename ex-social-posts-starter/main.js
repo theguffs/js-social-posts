@@ -58,51 +58,89 @@ const posts = [
 // lavoro miooooo
 
 // Visualizza l'array di post come una tabella nel console log (visto nella lezione del pomeriggioooo)
+
 console.table(posts);
 
 const container = document.getElementById('container');
 
-for (let i = 0; i < posts.length; i++) {
-    const post = posts[i];
-    const postElement = document.createElement('div');
-    postElement.classList.add('post');
+// formattare la data nel formato italiano
 
-    // Dichiarazione della variabile per l'HTML dell'immagine del profilo
-    let profileImageHTML = '';
-
-    //un if per controllare se l'immagine del profilo esiste (mannaggia a luca formicola)
-    if (post.author.image) {
-        profileImageHTML = `<img class="profile-pic" src="${post.author.image}" alt="${post.author.name}">`;
-    }
-
-    postElement.innerHTML = `
-        <div class="post__header">
-            <div class="post-meta">                    
-                <div class="post-meta__icon">${profileImageHTML}</div>
-                <div class="post-meta__data">
-                    <div class="post-meta__author">${post.author.name}</div>
-                    <div class="post-meta__time">${post.created}</div>
-                </div>                    
-            </div>
-        </div>
-        <div class="post__text">${post.content}</div>
-        <div class="post__image">
-            <img src="${post.media}" alt="">
-        </div>
-        <div class="post__footer">
-            <div class="likes js-likes">
-                <div class="likes__cta">
-                    <a class="like-button js-like-button" href="#" data-postid="${post.id}">
-                        <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
-                        <span class="like-button__label">Mi Piace</span>
-                    </a>
-                </div>
-                <div class="likes__counter">
-                    Piace a <b id="like-counter-${post.id}" class="js-likes-counter">${post.likes}</b> persone
-                </div>
-            </div> 
-        </div>
-    `;
-
-    container.appendChild(postElement);
+function formatDate(dateStr) {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
 }
+
+// Funzione per ottenere le iniziali dell'autore
+function getInitials(name) {
+    return name.split(' ').map(n => n[0]).join('');
+}
+
+// Funzione per aggiornare i post nel DOM
+function renderPosts() {
+    container.innerHTML = ''; // Pulisce il contenitore
+    for (let i = 0; i < posts.length; i++) {
+        const post = posts[i];
+        const postElement = document.createElement('div');
+        postElement.classList.add('post');
+
+        // Immagine del profilo o fallback
+        let profileImageHTML;
+        if (post.author.image) {
+            profileImageHTML = `<img class="profile-pic" src="${post.author.image}" alt="${post.author.name}">`;
+        } else {
+            const initials = getInitials(post.author.name);
+            profileImageHTML = `<div class="profile-pic-default">${initials}</div>`;
+        }
+
+        postElement.innerHTML = `
+            <div class="post__header">
+                <div class="post-meta">
+                    <div class="post-meta__icon">${profileImageHTML}</div>
+                    <div class="post-meta__data">
+                        <div class="post-meta__author">${post.author.name}</div>
+                        <div class="post-meta__time">${formatDate(post.created)}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="post__text">${post.content}</div>
+            <div class="post__image"><img src="${post.media}" alt=""></div>
+            <div class="post__footer">
+                <div class="likes js-likes">
+                    <div class="likes__cta">
+                        <a class="like-button js-like-button" data-postid="${post.id}">
+                            <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
+                            <span class="like-button__label">Mi Piace</span>
+                        </a>
+                    </div>
+                    <div class="likes__counter">
+                        Piace a <b id="like-counter-${post.id}" class="js-likes-counter">${post.likes}</b> persone
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(postElement);
+    }
+}
+
+// Gestore di eventi per i pulsanti del Mi Piace
+container.addEventListener('click', function(event) {
+    const button = event.target.closest('.js-like-button');
+    if (button) {
+        const postId = button.getAttribute('data-postid');
+        const post = posts.find(p => p.id == postId);
+        const likeCounter = document.getElementById(`like-counter-${postId}`);
+
+        // Incrementa o decrementa i like e aggiorna il pulsante
+        if (button.classList.contains('like-button--liked')) {
+            post.likes--;
+            button.classList.remove('like-button--liked');
+        } else {
+            post.likes++;
+            button.classList.add('like-button--liked');
+        }
+        likeCounter.textContent = post.likes;
+    }
+});
+
+renderPosts();

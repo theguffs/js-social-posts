@@ -123,3 +123,42 @@ h1 {
     color: #0CD977;
     cursor: default;
 }
+
+/* aggiunta mia*/
+
+.profile-pic-default {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0CD977;
+    height: 60px;
+    width: 60px;
+    overflow: hidden;
+    border-radius: 50%;
+    color: #023047;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.profile-pic {
+    border-radius: 50%;
+    max-width: 60px;
+}
+
+.like-button {
+    display: inline-block;
+    padding: 8px;
+    border-radius: 4px;    
+    text-decoration: none;
+    color: #404040;
+}
+
+.like-button:hover {
+    background-color: #e3e3e3;
+}
+
+.like-button--liked {
+    color: #0CD977; /* Colore quando il pulsante è cliccato */
+    cursor: default;
+}
